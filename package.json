@@ -1,0 +1,22 @@
+{
+  "name": "samsara-tabris",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/frh3ddy/samsara-tabris.git"
+  },
+  "keywords": [
+    "samsarajs"
+  ],
+  "author": "Fredy Mendez",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/frh3ddy/samsara-tabris/issues"
+  },
+  "homepage": "https://github.com/frh3ddy/samsara-tabris#readme"
+}
