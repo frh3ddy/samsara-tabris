@@ -98,7 +98,20 @@
         }
         else if (node._onAdd){
             // View case
-            return node._onAdd(this);
+            var addedNode = node._onAdd(this);
+            
+            var self = this;
+            preTickQueue.push(function(){
+                if (!self._cachedSpec.size) return;
+                self.size.trigger('start', self._cachedSpec.size);
+                self.layout.trigger('start', self._cachedSpec.layout);
+                dirtyQueue.push(function(){
+                    self.size.trigger('end', self._cachedSpec.size);
+                    self.layout.trigger('end', self._cachedSpec.layout);
+                });
+            });
+            
+            return addedNode;
         }
         else if (node instanceof RenderTreeNode){
             // RenderTree Node
