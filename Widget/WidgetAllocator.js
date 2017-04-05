@@ -78,9 +78,10 @@ WidgetAllocator.prototype.allocate = function allocate(type) {
  * @param element {Node} Widget element
  */
 WidgetAllocator.prototype.deallocate = function deallocate(element) {
-    var nodeType = element.type;
-    var nodeStore = this.detachedNodes[nodeType];
-    nodeStore.push(element);
+    element.dispose()
+//     var nodeType = element.type;
+//     var nodeStore = this.detachedNodes[nodeType];
+//     nodeStore.push(element);
 };
 
 module.exports = WidgetAllocator;
