@@ -79,7 +79,7 @@ function Surface(options) {
     var eventOutput = this._eventOutput
     var touchId = undefined
 
-    this._eventForwarder = function _eventForwarder({event}) {
+    this._eventForwarder = function _eventForwarder(event) {
 //         if(this.type === 'touchstart') {
 //           touchId = Math.floor((Math.random() * 100) + 1)
 //         }
@@ -87,7 +87,7 @@ function Surface(options) {
 //         var touch = event.touches[0];
 //         touch.identifier = touchId
 
-        eventOutput.emit(event);
+        eventOutput.emit(this.type);
     }
 
 
