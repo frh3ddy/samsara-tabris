@@ -138,12 +138,12 @@ var resizeEnd = Timer.debounce(function() {
 // Emit a resize event if the window's height or width has changed
 function handleResize() {
 
-    if (toolbarVisible) {
-      tabris.ui.set({
-        toolbarVisible: false,
-      })
-      toolbarVisible = false
-    }
+//     if (toolbarVisible) {
+//       tabris.ui.set({
+//         toolbarVisible: false,
+//       })
+//       toolbarVisible = false
+//     }
 
     var newHeight = screen.height
     var newWidth = screen.width
