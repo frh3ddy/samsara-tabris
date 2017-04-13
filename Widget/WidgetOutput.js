@@ -192,7 +192,7 @@ WidgetOutput.recallContent = function recallContent(element) {
       element.close()
     }
 
-    var df = tabris.create('Composite')
+    var df = new tabris.Composite()
     while (element.children().length) df.append(element.children());
     return df;
 };
