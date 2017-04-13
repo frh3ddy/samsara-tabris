@@ -25,7 +25,7 @@ function WidgetAllocator(container) {
  * @param container {Node} Widget element
  */
 WidgetAllocator.prototype.set = function(container){
-    if (!container) container = tabris.create('Composite')
+    if (!container) container = new tabris.Composite()
     this.container = container;
 };
 
