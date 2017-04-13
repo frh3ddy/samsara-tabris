@@ -1,5 +1,5 @@
 var core = require('./core')
-var widget = require('./widget')
+var widget = require('./Widget')
 var events = require('./events')
 var streams = require('./streams')
 var layouts = require('./layouts')
