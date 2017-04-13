@@ -1,10 +1,17 @@
+var core = require('./core')
+var widget = require('./widget')
+var events = require('./events')
+var streams = require('./streams')
+var layouts = require('./layouts')
+var inputs = require('./inputs')
+var fingers = require('./ui/Fingers')
 
 module.exports = {
-    Core: require('./core'),
-    Widget: require('./widget'),
-    Events: require('./events'),
-    Streams: require('./streams'),
-    Layouts: require('./layouts'),
-    Inputs: require('./inputs'),
-    Fingers: require('./ui/Fingers')
-};
+    Core: core,
+    Widget: widget,
+    Events: events,
+    Streams: streams,
+    Layouts: layouts,
+    Inputs: inputs,
+    Fingers: fingers
+}
