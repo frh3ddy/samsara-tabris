@@ -1,4 +1,3 @@
 module.exports = {
-    requestAnimationFrame: require('./animationFrame').requestAnimationFrame,
-    cancelAnimationFrame: require('./animationFrame').cancelAnimationFrame
+    requestAnimationFrame: require('./animationFrame')
 };

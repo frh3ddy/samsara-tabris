@@ -25,7 +25,9 @@ function WidgetAllocator(container) {
  * @param container {Node} Widget element
  */
 WidgetAllocator.prototype.set = function(container){
-    if (!container) container = new tabris.Composite()
+    if (!container) {
+        container = new tabris.Composite()
+    }
     this.container = container;
 };
 
@@ -55,16 +57,28 @@ WidgetAllocator.prototype.migrate = function migrate(container) {
  * @param type {string} Widget tagName, e.g., "div"
  * @return {Node}
  */
-WidgetAllocator.prototype.allocate = function allocate(type) {
+WidgetAllocator.prototype.allocate = function allocate(type, direction) {
     if (!(type in this.detachedNodes)) this.detachedNodes[type] = [];
     var nodeStore = this.detachedNodes[type];
     var result;
     if (nodeStore.length === 0){
-        result = new tabris[type]({
-          opacity: 0
-        })
+        if(direction) {
+            result = new tabris[type]({
+                opacity: 0,
+                direction: direction
+            })
+        } else {
+            result = new tabris[type]({
+                opacity: 0
+            })
+        }
 
         this.container.append(result);
+
+        // if(type === 'ScrollView') {
+        //     var comp1 = new tabris.Composite({width: 100, height: 200, background: 'green'})
+        //     result.append(comp1)
+        // }
     }
     else result = nodeStore.shift();
 

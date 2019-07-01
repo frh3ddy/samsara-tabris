@@ -30,14 +30,14 @@ var EDGE = {
 var Scrollview = View.extend({
     defaults: {
         direction: CONSTANTS.DIRECTION.Y,
-        drag: 0.3,
+        scrollbarVisible: true,
+        spacing: 0,
         paginated: false,
         pageChangeSpeed: 0.5,
         startPosition: 0,
         marginTop: 0,
         marginBottom: 0,
         clip: true,
-        enableMouseDrag: false,
         pageTransition: {
             curve : 'spring',
             period : 100,
@@ -48,171 +48,55 @@ var Scrollview = View.extend({
             period: 100,
             damping: 1
         },
-        edgeGrip: 0.5
     },
     initialize: function (options) {
         this._currentIndex = 0;
         this._previousIndex = 0;
         this.itemOffset = 0;
         this.items = [];
-        this.velocity = 0;
-        this.overflow = 0;
-
-        var isTouching = false;
-        var isMouseWheelActive = false;
-        var edge = EDGE.NONE;
+        
+        var composite = new tabris.Composite()
 
         this.layout = new SequentialLayout({
-            direction: options.direction
+            direction: options.direction,
+            spacing: options.spacing,
+            offset: options.marginTop
         });
 
-
-        var touchInput = new TouchInput({
-            direction: options.direction
+        this.container = new ContainerSurface({
+            tagName: 'ScrollView',
+            properties: {
+                scrollbarVisible: options.scrollbarVisible,
+                direction: options.direction
+            }
         });
 
-        var position = new Accumulator(-options.startPosition);
+        this.container.on('deploy', function(target) {
+            target.append(composite)
+        })
 
-        this.drag = new Transitionable(0);
-        this.spring = new Transitionable(0);
-
-        var dragDifferential = new Differential();
-        var springDifferential = new Differential();
-        var gestureDifferential = touchInput.pluck('delta');
-
-        dragDifferential.subscribe(this.drag);
-        springDifferential.subscribe(this.spring);
-
-        position.subscribe(gestureDifferential);
-        position.subscribe(dragDifferential);
-        position.subscribe(springDifferential);
-
-        // var scrollInput = genericInput.getInput('scroll');
-        // scrollInput.on('start', function(){
-        //     isMouseWheelActive = true;
-        // });
-
-        // scrollInput.on('end', function(){
-        //     isMouseWheelActive = false;
-        // });
-
-        touchInput.on('start', function () {
-            isTouching = true;
-            this.drag.halt();
-            this.spring.halt();
-        }.bind(this));
-
-        touchInput.on('update', function (data) {
-            this.velocity = data.velocity;
-        }.bind(this));
-
-        touchInput.on('end', function (data) {
-            isTouching = false;
-
-            switch (edge){
-                case EDGE.NONE:
-                    (this.options.paginated)
-                        ? handlePagination.call(this, data.velocity)
-                        : handleDrag.call(this, data.velocity);
-                    break;
-                case EDGE.TOP:
-                    handleEdge.call(this, this.overflow, data.velocity);
-                    break;
-                case EDGE.BOTTOM:
-                    handleEdge.call(this, this.overflow, data.velocity);
-                    break;
+        this.layout.on('start', function(payload) {
+            if(options.direction === 1) {
+                composite.height = payload
+            } else {
+                composite.width = payload
             }
-        }.bind(this));
+        })
 
-        this.drag.on('update', function(){
-            this.velocity = this.drag.getVelocity();
-        }.bind(this));
-
-        this.spring.on('update', function(){
-            this.velocity = this.spring.getVelocity();
-        }.bind(this));
-
-        position.on('end', function () {
-            if (!this.spring.isActive())
-                changePage.call(this, this._currentIndex);
-        }.bind(this));
-
-        // overflow is a measure of how much of the content
-        // extends past the viewport
-        var overflowStream = Stream.lift(function (contentLength, viewportSize) {
-            if (!contentLength) return false;
-            var overflow = viewportSize[options.direction] - options.marginBottom - contentLength;
-            return (overflow >= 0) ? false : overflow;
-        }, [this.layout, this.size]);
-
-        this.offset = Stream.lift(function (top, overflow) {
-            if (!overflow) return false;
-
-            if (this.spring.isActive()) return Math.round(top);
-
-            if (top > 0) { // reached top of scrollview
-                // if (isMouseWheelActive){
-                //     edge = EDGE.TOP;
-                //     position.set(0, true);
-                //     changePage.call(this, this._currentIndex);
-                //     return 0;
-                // }
-
-                this.overflow = top;
-
-                if (edge !== EDGE.TOP){
-                    touchInput.setOptions({scale: this.options.edgeGrip});
-
-                    edge = EDGE.TOP;
-                    if (!isTouching)
-                        handleEdge.call(this, this.overflow, this.velocity);
-                }
+        this.layout.on('update', function(payload) {
+            if(options.direction === 1) {
+                composite.height = payload
+            } else {
+                composite.width = payload
             }
-            else if(top < overflow) { // reached bottom of scrollview
-                // if (isMouseWheelActive) {
-                //     edge = EDGE.BOTTOM;
-                //     position.set(overflow, true);
-                //     changePage.call(this, this._currentIndex);
-                //     return overflow;
-                // }
+        })
 
-                this.overflow = top - overflow;
+        
 
-                if (edge !== EDGE.BOTTOM){
-                    touchInput.setOptions({scale: .5});
-
-                    edge = EDGE.BOTTOM;
-
-                    if (!isTouching)
-                        handleEdge.call(this, this.overflow, this.velocity);
-                }
-            }
-            else if(top > overflow && top < 0 && edge !== EDGE.NONE){
-                this.overflow = 0;
-                touchInput.setOptions({scale: 1});
-                edge = EDGE.NONE;
-            }
-
-            return Math.round(top);
-        }.bind(this), [position, overflowStream]);
-
-        var transform = this.offset.map(function (position) {
-            position += options.marginTop;
-            return options.direction === CONSTANTS.DIRECTION.Y
-                ? Transform.translateY(position)
-                : Transform.translateX(position);
-        });
-
-        this.container = new ContainerSurface();
-
-        touchInput.subscribe(this.container);
-
-        this.container.add({transform : transform}).add(this.layout);
+        this.container.add(this.layout);
         this.add(this.container);
     },
-    // setPerspective: function(){
-    //     ContainerSurface.prototype.setPerspective.apply(this.container, arguments);
-    // },
+
     getVelocity: function(){
         return this.velocity;
     },
@@ -242,58 +126,9 @@ var Scrollview = View.extend({
             this.layout.push(items[i]);
 
         this.items = items;
-
-        var args = [this.offset];
-        for (i = 0; i < items.length; i++) {
-            args.push(items[i].size);
-        }
-
-        var accumLength = 0;
-        var itemOffsetStream = Stream.lift(function () {
-            if (arguments[0] === undefined || arguments[1] === undefined)
-                return false;
-
-            var offset = arguments[0];
-            var direction = this.options.direction;
-            var index = this._currentIndex;
-            var currentSize = arguments[index + 1];
-
-            if (!currentSize) return false;
-
-            var progress = 0;
-            var itemOffset = -offset - accumLength;
-            var currentLength = currentSize[direction];
-
-            if (itemOffset >= currentLength && this._currentIndex !== items.length - 1) {
-                // pass currentNode forwards
-                this._currentIndex++;
-                progress = 0;
-                accumLength += currentLength;
-            }
-            else if (itemOffset < 0 && this._currentIndex !== 0) {
-                // pass currentNode backwards
-                this._currentIndex--;
-                progress = 1;
-                currentLength = arguments[this._currentIndex + 1][direction];
-                accumLength -= currentLength;
-            }
-            else {
-                progress = itemOffset / currentLength;
-            }
-
-            this.itemOffset = itemOffset;
-
-            return {
-                index: this._currentIndex,
-                progress: progress
-            };
-        }.bind(this), args);
-
-        this.output.subscribe(itemOffsetStream);
-
-        itemOffsetStream.on('start', function () {});
-        itemOffsetStream.on('update', function () {});
-        itemOffsetStream.on('end', function () {});
+    },
+    removeItem: function(item) {
+        this.layout.unlink(item)
     }
 }, CONSTANTS);
 
@@ -301,13 +136,6 @@ function changePage(index) {
     if (index === this._previousIndex) return;
     this.emit('page', index);
     this._previousIndex = index;
-}
-
-function handleEdge(overflow, velocity){
-    this.drag.halt();
-    this.spring.reset(overflow);
-    this.options.edgeTransition.velocity = velocity;
-    this.spring.set(0, this.options.edgeTransition);
 }
 
 function handlePagination(velocity){
@@ -340,14 +168,5 @@ function handlePagination(velocity){
     this.spring.set(0, this.options.pageTransition);
 }
 
-function handleDrag(velocity){
-    this.drag.halt();
-    this.drag.reset(0);
-    this.drag.set(0, {
-        curve: 'inertia',
-        velocity: velocity,
-        drag: this.options.drag
-    });
-}
 
 module.exports = Scrollview;

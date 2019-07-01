@@ -11,8 +11,8 @@
 
 
     function isSizeType(type) {
-      if (type === undefined) return false
-      return type.constructor === Array
+        if (type === undefined) return false
+        return type.constructor === Array
     }
 
     /**
@@ -77,8 +77,8 @@
                 return this._cachedSize;
             }
 
-            var width = this.container.get('bounds').width
-            var height = this.container.get('bounds').height
+            var width = this.container.bounds.width
+            var height = this.container.bounds.height
 
             if (width !== this._cachedSize[0] || height !== this._cachedSize[1]){
                 this._cachedSize[0] = width;
@@ -182,9 +182,9 @@
      * @param handler {Function}    Callback
      */
     Context.prototype.on = function on(type, handler){
-      var event = {
-          type: type,
-      }
+        var event = {
+            type: type,
+        }
         if (this.container)
             this.container.on(type, this._eventForwarder, event);
 

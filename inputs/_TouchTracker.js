@@ -41,10 +41,10 @@
         EventHandler.setInputHandler(this, this._eventInput);
         EventHandler.setOutputHandler(this, this._eventOutput);
 
-        this._eventInput.on('touchstart', handleStart.bind(this));
-        this._eventInput.on('touchmove', handleMove.bind(this));
-        this._eventInput.on('touchend', handleEnd.bind(this));
-        this._eventInput.on('touchcancel', handleEnd.bind(this));
+        this._eventInput.on('touchStart', handleStart.bind(this));
+        this._eventInput.on('touchMove', handleMove.bind(this));
+        this._eventInput.on('touchEnd', handleEnd.bind(this));
+        this._eventInput.on('touchCancel', handleEnd.bind(this));
     }
 
     TouchTracker.DEFAULT_OPTIONS = {
@@ -78,10 +78,10 @@
 
     function getData(touch, event, history) {
         return {
-            x: touch.pageX,
-            y: touch.pageY,
+            x: touch.absoluteX,
+            y: touch.absoluteY,
             touchId : touch.identifier,
-            timestamp: now(),
+            timestamp: event.timeStamp,
             count: event.touches.length,
             event: touch,
             history: history

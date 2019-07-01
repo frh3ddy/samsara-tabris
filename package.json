@@ -1,22 +1,47 @@
 {
-  "name": "samsara-tabris",
-  "version": "1.0.2",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "_from": "git+https://github.com/frh3ddy/samsara-tabris.git",
+  "_id": "samsara-tabris@1.0.2",
+  "_inBundle": false,
+  "_integrity": "",
+  "_location": "/samsara-tabris",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "git",
+    "raw": "https://github.com/frh3ddy/samsara-tabris.git",
+    "rawSpec": "https://github.com/frh3ddy/samsara-tabris.git",
+    "saveSpec": "git+https://github.com/frh3ddy/samsara-tabris.git",
+    "fetchSpec": "https://github.com/frh3ddy/samsara-tabris.git",
+    "gitCommittish": null
   },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "git+https://github.com/frh3ddy/samsara-tabris.git#9e8196bd602692c334dce676609d7ba84204dfbc",
+  "_spec": "https://github.com/frh3ddy/samsara-tabris.git",
+  "_where": "/Users/fredymendez/tabris/lolita",
+  "author": {
+    "name": "Fredy Mendez"
+  },
+  "bugs": {
+    "url": "https://github.com/frh3ddy/samsara-tabris/issues"
+  },
+  "bundleDependencies": false,
+  "deprecated": false,
+  "description": "This is a fork of SamsaraJs, about 95% is samsara code, DOM is replace with Tabris Widget",
+  "homepage": "https://github.com/frh3ddy/samsara-tabris#readme",
+  "keywords": [
+    "samsarajs"
+  ],
+  "license": "ISC",
+  "main": "index.js",
+  "name": "samsara-tabris",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/frh3ddy/samsara-tabris.git"
   },
-  "keywords": [
-    "samsarajs"
-  ],
-  "author": "Fredy Mendez",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/frh3ddy/samsara-tabris/issues"
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "homepage": "https://github.com/frh3ddy/samsara-tabris#readme"
+  "version": "1.0.2"
 }

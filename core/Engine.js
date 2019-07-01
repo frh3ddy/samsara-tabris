@@ -1,9 +1,9 @@
 /* Copyright © 2015-2016 David Valdman */
 // TODO: cancel RAF when asleep
 
-var polyfills = require('./polyfills');
-var rAF = polyfills.requestAnimationFrame;
-var cAF = polyfills.cancelAnimationFrame;
+var polyfills = require('./polyfills/animationFrame');
+var rAF = window.requestAnimationFrame;
+var cAF = window.cancelAnimationFrame;
 
 var EventHandler = require('../events/EventHandler');
 var postTickQueue = require('./queues/postTickQueue');
@@ -23,7 +23,8 @@ var windowHeight = Number.NaN;
 var toolbarVisible = true
 
 // Listen to window resize events
-tabris.device.on('change:orientation', handleResize)
+tabris.device.onOrientationChanged(handleResize)
+// tabris.device.on('change:orientation', handleResize)
 
 /**
  * Engine is a singleton object that is required to run a Samsara application.

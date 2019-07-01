@@ -39,31 +39,31 @@ function _round(value, unit){
 }
 
 function _formatPropertyTransform(transform, unit) {
-  var result = [];
+    var result = [];
 
-  for (var i = 0; i < 15; i++) {
-    if (Math.abs(transform[i]) < EPSILON) {
-      transform[i] = 0
+    for (var i = 0; i < 15; i++) {
+        if (Math.abs(transform[i]) < EPSILON) {
+        transform[i] = 0
     }
 
     if (i === 12 || i === 13) {
-      result.push(_round(transform[i], unit))
+        result.push(_round(transform[i], unit))
     } else {
-      result.push(transform[i])
+        result.push(transform[i])
     }
-  }
+    }
 
-  result.push(transform[15])
+    result.push(transform[15])
 
-  var T = Transform.interpret(result)
+    var T = Transform.interpret(result)
 
-  return {
-    translationX: T.translate[0],
-    translationY: T.translate[1],
-    scaleX: T.scale[0],
-    scaleY: T.scale[1],
-    rotation: T.rotate[0]
-  }
+    return {
+        translationX: T.translate[0],
+        translationY: T.translate[1],
+        scaleX: T.scale[0],
+        scaleY: T.scale[1],
+        rotation: T.rotate[0]
+    }
 }
 
 function _formatPropertyOrigin(element, origin, size, currentOrigin) {
@@ -87,25 +87,25 @@ var _setOrigin =  function _setOrigin(element, origin, size, currentOrigin) {
 };
 
 var _setTransform = function _setTransform(element, transform, unit) {
-  var transformProperties = _formatPropertyTransform(transform, unit)
+    var transformProperties = _formatPropertyTransform(transform, unit)
 
-  element.set('transform', transformProperties)
+    element.transform = transformProperties
 
 };
 
 
 function _setSize(element, size){
-    if (size[0] === true) size[0] = element.get('bounds').width;
-    else if (size[0] >= 0) element.set('width', size[0])
+    if (size[0] === true) size[0] = element.bounds.width;
+    else if (size[0] >= 0) element.width = size[0]
 
-    if (size[1] === true) size[1] = element.get('bounds').height;
-    else if (size[1] >= 0) element.set('height', size[1])
+    if (size[1] === true) size[1] = element.bounds.height;
+    else if (size[1] >= 0) element.height = size[1]
 }
 
 // pointerEvents logic allows for DOM events to pass through the element when invisible
 function _setOpacity(element, opacity) {
     if (!this._isVisible && opacity > MIN_OPACITY) {
-        element.set('enabled', true)
+        element.enabled = true
         this._isVisible = true;
     }
 
@@ -113,20 +113,20 @@ function _setOpacity(element, opacity) {
     else if (opacity < MIN_OPACITY) {
         opacity = MIN_OPACITY;
         if (this._isVisible) {
-            element.set('enabled', false)
+            element.enabled = false
             this._isVisible = false;
         }
     }
 
-    element.set('opacity', opacity)
+    element.opacity = opacity
 }
 
 WidgetOutput.getWidth = function getWidth(element){
-    return element.get('bounds').width
+    return element.bounds.width
 };
 
 WidgetOutput.getHeight = function getHeight(element){
-    return element.get('bounds').height
+    return element.bounds.height
 };
 
 WidgetOutput.getSize = function getSize(element){
@@ -144,8 +144,12 @@ WidgetOutput.applyClass = function applyClass(element, className) {
 };
 
 WidgetOutput.applyProperties = function applyProperties(element, properties) {
+    // tabris ScrollView's direction prperty can only be set on the constructor and cannot be change
+    if(element._nativeType === 'tabris.ScrollView') {
+        delete properties.direction
+    }
     for (var key in properties)
-        element.set(key, properties[key])
+        element[key] = properties[key]
 };
 
 
@@ -166,11 +170,27 @@ WidgetOutput.removeProperties = function removeProperties(element, properties) {
 
 
 WidgetOutput.on = function on(element, type, handler) {
-  var event = {
-      type: type,
-  }
+    var event = {
+        type: type,
+    }
 
-  element.on(type, handler, event);
+    var cap = type.charAt(0).toUpperCase() + type.slice(1)
+    var newType = 'on' + cap
+
+    switch(newType) {
+        case 'onTap':
+        case 'onTouchStart':
+        case 'onTouchMove':
+        case 'onTouchEnd':
+        case 'onTouchCancel':
+            element[newType](handler, event)
+            break
+        default:
+    }
+    
+    // element[newType](handler, event)
+
+    // element.on(type, handler, event);
 };
 
 WidgetOutput.off = function off(element, type, handler) {
@@ -182,14 +202,14 @@ WidgetOutput.applyContent = function applyContent(element, content) {
         while (element.children().length) element.children().firstChild().dispose();
         element.append(content);
     } else if (content === undefined) {
-      return
+        return
     }
     else element.append(content);
 };
 
 WidgetOutput.recallContent = function recallContent(element) {
     if(element instanceof tabris.Page) {
-      element.close()
+        element.close()
     }
 
     var df = new tabris.Composite()
@@ -198,24 +218,23 @@ WidgetOutput.recallContent = function recallContent(element) {
 };
 
 WidgetOutput.makeVisible = function makeVisible(element, size){
-    element.set('visible', true)
-
+    element.visible = true
     // for true-sized elements, reset height and width
     if (size){
-        if (size[0] === true) element.set('width', null)
-        if (size[1] === true) element.set('height', null)
+        if (size[0] === true) element.width = 'auto'
+        if (size[1] === true) element.height = 'auto'
     }
 };
 
 WidgetOutput.makeInvisible = function makeInvisible(element){
-    element.set('visible', false)
+    element.visible = false
 
     //Maybe setting visible to false is enough
-    element.set('opacity', 0)
-    element.set('width', 0)
-    element.set('height', 0)
+    element.opacity = 0
+    element.width = 0
+    element.height = 0
 
-    element.set('transform', {})
+    element.transform = {}
 };
 
 

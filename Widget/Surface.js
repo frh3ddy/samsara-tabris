@@ -70,6 +70,7 @@ function Surface(options) {
     this._allocator = null;
     this._currentTarget = null;
     this._elementOutput = new WidgetOutput();
+    this._options = options
 
     this._eventOutput = new EventHandler();
     EventHandler.setOutputHandler(this, this._eventOutput);
@@ -87,7 +88,7 @@ function Surface(options) {
 //         var touch = event.touches[0];
 //         touch.identifier = touchId
 
-        eventOutput.emit(this.type);
+        eventOutput.emit(event.type, event);
     }
 
 
@@ -118,16 +119,12 @@ function Surface(options) {
 
     this.layout.on('update', function(layout){
         if (!this._currentTarget) return;
-        this._elementOutput.commitLayout(this._currentTarget,
-                                         layout,
-                                         this._cachedSpec);
+        this._elementOutput.commitLayout(this._currentTarget, layout, this._cachedSpec);
     }.bind(this));
 
     this.layout.on('end', function(layout){
         if (!this._currentTarget) return;
-        this._elementOutput.commitLayout(this._currentTarget,
-                                         layout,
-                                         this._cachedSpec);
+        this._elementOutput.commitLayout(this._currentTarget, layout, this._cachedSpec);
         // WidgetOutput.demoteLayer(this._currentTarget);
     }.bind(this));
 
@@ -161,7 +158,7 @@ function commitSize(size){
 Surface.prototype.setContent = function setContent(content){
     if (this.content === undefined || this.content.cid !== content.cid){
         if(this.content !== undefined) {
-          this.content.dispose()
+            this.content.dispose()
         }
 
         this.content = content;
@@ -382,12 +379,20 @@ Surface.prototype.off = function off(type, handler) {
  * @param allocator {DOMAllocator} Allocator
  */
 Surface.prototype.setup = function setup(allocator) {
+    var target
     if (this._currentTarget) return;
 
     this._allocator = allocator;
 
     // create element of specific type
-    var target = allocator.allocate(this.elementType);
+    //tabris ScrollView's direction prperty can only be set on the constructor and cannot be change
+    //the default value is vertical, we need to pass the horizontal value only and only to the ScrollView type
+    if(this.elementType === 'ScrollView' && !this._options.properties.direction) {
+        // console.log('testScroll ', this._options.properties.direction)
+        target = allocator.allocate(this.elementType, 'horizontal');
+    } else {
+        target = allocator.allocate(this.elementType);
+    }
     this._currentTarget = target
 
     // add any element classes
